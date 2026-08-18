@@ -1,0 +1,61 @@
+# ── AI Meeting Assistant ── requirements.txt ──────────────────────────────────
+# Python >= 3.10, < 3.12 recommended (whisper / torch / chromadb compatibility)
+# GPU users: install torch/torchaudio separately from https://pytorch.org
+#            BEFORE this file, matching your CUDA version, then comment out
+#            the torch lines below so pip doesn't overwrite the CUDA build.
+
+# ── Audio / Video acquisition ─────────────────────────────────────────────────
+yt-dlp>=2024.4.9                  # Download audio from YouTube URLs
+pydub>=0.25.1                     # Audio file manipulation / format conversion
+ffmpeg-python>=0.2.0              # FFmpeg bindings (FFmpeg binary must be installed separately)
+soundfile>=0.12.1                 # Read/write WAV/FLAC — needed by pyannote & librosa
+librosa>=0.10.2                   # Audio resampling / feature extraction
+
+# ── Speech-to-Text (local Whisper) ────────────────────────────────────────────
+faster-whisper>=1.0.3             # CTranslate2-based Whisper — ~4x faster, less RAM than openai-whisper
+openai-whisper>=20231117          # Kept as fallback/reference implementation (optional — see note below)
+torch>=2.2.0                      # PyTorch backend
+torchaudio>=2.2.0                 # Audio utilities for PyTorch
+
+# ── Speaker Diarization (who-said-what in the meeting) ────────────────────────
+pyannote.audio>=3.3.0             # Speaker diarization pipeline (needs HF token for pretrained models)
+
+# ── Translation & Language Detection (Hindi → English) ────────────────────────
+deep-translator>=1.11.4           # Lightweight translation wrapper (Google backend)
+langdetect>=1.0.9                 # Auto-detect source language before translating
+
+# ── LLM Orchestration — LangChain LCEL + Mistral ──────────────────────────────
+langchain>=0.2.0,<0.3.0
+langchain-core>=0.2.0,<0.3.0
+langchain-community>=0.2.0,<0.3.0
+langchain-mistralai>=0.1.0        # LangChain wrapper for Mistral API
+mistralai>=0.4.0                  # Official Mistral Python client
+# Note: pin the 0.2.x line together — LangChain's submodules move fast and
+# mixing major versions across langchain-core/community/langchain is the
+# #1 cause of ImportError in this stack.
+
+# ── RAG Pipeline ──────────────────────────────────────────────────────────────
+chromadb>=0.5.0                   # Local vector store
+sentence-transformers>=3.0.0      # HuggingFace embedding models
+langchain-huggingface>=0.0.3      # LangChain ↔ HuggingFace embeddings bridge
+huggingface-hub>=0.23.0           # Model downloading from HuggingFace Hub
+tiktoken>=0.7.0                   # Token counting for text splitting
+accelerate>=0.31.0                # Speeds up HF model loading/inference (CPU & GPU)
+
+# ── Streamlit UI ──────────────────────────────────────────────────────────────
+streamlit>=1.35.0
+streamlit-extras>=0.4.0           # Additional Streamlit widgets / utilities
+watchdog>=4.0.0                   # File-change watcher (improves Streamlit hot-reload)
+
+# ── PDF / DOCX / TXT Export ────────────────────────────────────────────────────
+reportlab>=4.2.0                  # PDF generation
+fpdf2>=2.7.9                      # Lightweight alternative PDF library
+python-docx>=1.1.2                # Export meeting minutes as Word docs
+
+# ── Utilities ───────────────────────────────────────────────────────────────��─
+python-dotenv>=1.0.0              # Load API keys from .env
+numpy>=1.26.0,<2.0.0              # Pin <2.0 — several deps above (whisper, chromadb) aren't NumPy-2 ready yet
+scipy>=1.13.0                     # Needed by librosa/pyannote, not always pulled transitively
+tqdm>=4.66.0                      # Progress bars
+requests>=2.32.0
+protobuf>=4.25.0,<5.0.0           # Pin to avoid sentencepiece/transformers version clashes
