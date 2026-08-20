@@ -22,10 +22,9 @@ def download_youtube_audio(url: str) -> str:
         "format": "bestaudio/best",
         "outtmpl": output_path,
 
-        # Use Chrome cookies for YouTube authentication
         "cookiesfrombrowser": ("chrome",),
 
-        # Convert downloaded audio to WAV
+       
         "postprocessors": [
             {
                 "key": "FFmpegExtractAudio",
@@ -78,7 +77,6 @@ def convert_to_wav(input_path: str) -> str:
 
     audio = AudioSegment.from_file(input_path)
 
-    # Convert to mono + 16 kHz
     audio = audio.set_channels(1)
     audio = audio.set_frame_rate(16000)
 
@@ -154,7 +152,6 @@ def process_input(source: str) -> list:
 
         wav_path = convert_to_wav(source)
 
-    # Make sure the final audio is suitable for Whisper/RAG
     print("\nConverting audio to 16 kHz mono...")
 
     audio = AudioSegment.from_wav(wav_path)
